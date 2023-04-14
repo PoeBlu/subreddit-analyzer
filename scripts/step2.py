@@ -18,14 +18,15 @@ def main():
 
     """
 
-    comments_list = list()
-
-    for row in csv.DictReader(open("./mexico-comments.csv", "r", encoding="utf-8")):
-        comments_list.append(row["body"])
-
+    comments_list = [
+        row["body"]
+        for row in csv.DictReader(
+            open("./mexico-comments.csv", "r", encoding="utf-8")
+        )
+    ]
     # We take 50,000 random comments from the comments list.
     corpus = random.sample(comments_list, 50000)
-    
+
     nlp = spacy.load("es_core_news_sm")
 
     # Our corpus is bigger than the default limit, we will set
@@ -56,12 +57,18 @@ def get_tokens(nlp, corpus):
 
         doc = nlp(" ".join(corpus[i:i+1000]))
 
-        for token in doc:
-            data_list.append([
-                token.text, token.lower_, token.lemma_, token.lemma_.lower(),
-                token.pos_, token.is_alpha, token.is_stop
-            ])
-
+        data_list.extend(
+            [
+                token.text,
+                token.lower_,
+                token.lemma_,
+                token.lemma_.lower(),
+                token.pos_,
+                token.is_alpha,
+                token.is_stop,
+            ]
+            for token in doc
+        )
     with open("./tokens.csv", "w", encoding="utf-8", newline="") as tokens_file:
         csv.writer(tokens_file).writerows(data_list)
 
@@ -80,14 +87,12 @@ def get_entities(nlp, corpus):
     """
 
     data_list = [["text", "text_lower", "label"]]
-    
+
     for i in range(0, len(corpus), 1000):
 
         doc = nlp(" ".join(corpus[i:i+1000]))
 
-        for ent in doc.ents:
-            data_list.append([ent.text, ent.lower_, ent.label_])
-
+        data_list.extend([ent.text, ent.lower_, ent.label_] for ent in doc.ents)
     with open("./entities.csv", "w", encoding="utf-8", newline="") as entities_file:
         csv.writer(entities_file).writerows(data_list)
 

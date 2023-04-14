@@ -42,7 +42,7 @@ def get_most_common_domains(df):
 
     """
 
-    df = df["domain"].value_counts()[0:20]
+    df = df["domain"].value_counts()[:20]
     print(df)
 
 
@@ -59,7 +59,7 @@ def get_most_common_submitters(df):
     # Optional: Remove the [deleted] user.
     df.drop(df[df["author"] == "[deleted]"].index, inplace=True)
 
-    df = df["author"].value_counts()[0:20]
+    df = df["author"].value_counts()[:20]
     print(df)
 
 
@@ -76,7 +76,7 @@ def get_most_common_commenters(df):
     # Optional: Remove the [deleted] user.
     df.drop(df[df["author"] == "[deleted]"].index, inplace=True)
 
-    df = df["author"].value_counts()[0:20]
+    df = df["author"].value_counts()[:20]
     print(df)
 
 
@@ -147,21 +147,26 @@ def plot_submissions_and_comments_by_weekday(df, df2):
     total2 = len(df2)
 
     # 0 to 6 (Monday to Sunday).
-    submissions_weekdays = {i: 0 for i in range(0, 7)}
-    comments_weekdays = {i: 0 for i in range(0, 7)}
+    submissions_weekdays = {i: 0 for i in range(7)}
+    comments_weekdays = {i: 0 for i in range(7)}
 
     # We filter the DataFrames and set each weekday value
     # equal to its number of records.
-    for k, v in submissions_weekdays.items():
+    for k in submissions_weekdays:
         submissions_weekdays[k] = len(df[df.index.weekday == k])
 
-    for k, v in comments_weekdays.items():
+    for k in comments_weekdays:
         comments_weekdays[k] = len(df2[df2.index.weekday == k])
 
     # The first set of vertical bars have a little offset to the left.
     # This is so the next set of bars can fit in the same place.
-    bars = plt.bar([i - 0.2 for i in submissions_weekdays.keys()], [(i / total) * 100 for i in submissions_weekdays.values()], 0.4,
-                   color="#1565c0", linewidth=0)
+    bars = plt.bar(
+        [i - 0.2 for i in submissions_weekdays],
+        [(i / total) * 100 for i in submissions_weekdays.values()],
+        0.4,
+        color="#1565c0",
+        linewidth=0,
+    )
 
     # This loop creates small texts with the absolute values above each bar.
     for bar in bars:
@@ -173,8 +178,13 @@ def plot_submissions_and_comments_by_weekday(df, df2):
 
     # This set of bars have a little offset to the right so they can fit
     # with the previous ones.
-    bars2 = plt.bar([i + 0.2 for i in comments_weekdays.keys()], [(i / total2) * 100 for i in comments_weekdays.values()], 0.4,
-                    color="#f9a825", linewidth=0)
+    bars2 = plt.bar(
+        [i + 0.2 for i in comments_weekdays],
+        [(i / total2) * 100 for i in comments_weekdays.values()],
+        0.4,
+        color="#f9a825",
+        linewidth=0,
+    )
 
     # This loop creates small texts with the absolute values above each bar (second set of bars).
     for bar2 in bars2:
@@ -228,22 +238,26 @@ def plot_submissions_and_comments_by_hour(df, df2):
     total2 = len(df2)
 
     # We create dictionaries with keys from 0 to 23 (11 pm) hours.
-    submissions_hours = {i: 0 for i in range(0, 24)}
-    comments_hours = {i: 0 for i in range(0, 24)}
+    submissions_hours = {i: 0 for i in range(24)}
+    comments_hours = {i: 0 for i in range(24)}
 
     # We filter the DataFrames and set each hour value
     # equal to its number of records.
-    for k, v in submissions_hours.items():
+    for k in submissions_hours:
         submissions_hours[k] = len(df[df.index.hour == k])
 
-    for k, v in comments_hours.items():
+    for k in comments_hours:
         comments_hours[k] = len(df2[df2.index.hour == k])
 
     # The first set of horizontal bars have a little offset to the top.
     # This is so the next set of bars can fit in the same place.
-    bars = plt.barh(y=[i + 0.2 for i in submissions_hours.keys()],
-                    width=[(i / total) * 100 for i in submissions_hours.values()],
-                    height=0.4, color="#1565c0",  linewidth=0)
+    bars = plt.barh(
+        y=[i + 0.2 for i in submissions_hours],
+        width=[(i / total) * 100 for i in submissions_hours.values()],
+        height=0.4,
+        color="#1565c0",
+        linewidth=0,
+    )
 
     # This loop creates small texts with the absolute values next to each bar.
     for bar in bars:
@@ -255,9 +269,13 @@ def plot_submissions_and_comments_by_hour(df, df2):
 
     # This set of bars have a little offset to the bottom so they can fit
     # with the previous ones.
-    bars2 = plt.barh(y=[i - 0.2 for i in comments_hours.keys()],
-                     width=[(i / total2) * 100 for i in comments_hours.values()],
-                     height=0.4, color="#f9a825", linewidth=0)
+    bars2 = plt.barh(
+        y=[i - 0.2 for i in comments_hours],
+        width=[(i / total2) * 100 for i in comments_hours.values()],
+        height=0.4,
+        color="#f9a825",
+        linewidth=0,
+    )
 
     # This loop creates small texts with the absolute values next to each bar (second set of bars).
     for bar2 in bars2:
@@ -360,14 +378,10 @@ def plot_submissions_by_user(df):
     values = [one, two_to_five, six_to_ten, eleven_to_twenty,
               twentyone_to_fifty, fiftyone_to_onehundred, more_than_onehundred]
 
-    # We will make our own legend labels calculating the percentages of each bucket.
-    final_labels = list()
-
-    for index, item in enumerate(values):
-
-        final_labels.append("{} - {:.2f}% ({:,})".format(
-            labels[index], item / total * 100, item))
-
+    final_labels = [
+        "{} - {:.2f}% ({:,})".format(labels[index], item / total * 100, item)
+        for index, item in enumerate(values)
+    ]
     # We eemove the lines that separate the pie sections.
     plt.rcParams["patch.linewidth"] = 0
 
@@ -432,14 +446,10 @@ def plot_comments_by_user(df):
     values = [one, two_to_ten, eleven_to_twenty, twentyone_to_fifty, fiftyone_to_onehundred,
               onehundredone_to_fivehundred, fivehundredone_to_onethousand, morethanonethousand]
 
-    # We will make our own legend labels calculating the percentages of each bucket.
-    final_labels = list()
-
-    for index, item in enumerate(values):
-
-        final_labels.append(
-            "{} - {:.2f}% ({:,})".format(labels[index], item / total * 100, item))
-
+    final_labels = [
+        "{} - {:.2f}% ({:,})".format(labels[index], item / total * 100, item)
+        for index, item in enumerate(values)
+    ]
     # We eemove the lines that separate the pie sections.
     plt.rcParams["patch.linewidth"] = 0
 
@@ -471,7 +481,7 @@ def generate_most_common_words_word_cloud(df):
 
     # We load English and Spanish stop words that will be
     # get better results in our word cloud.
-    stopwords = list()
+    stopwords = []
 
     stopwords.extend(
         open(EN_STOPWORDS, "r", encoding="utf-8").read().splitlines())
@@ -492,12 +502,10 @@ def generate_most_common_words_word_cloud(df):
 
     # Now that we have the words and their counts we will create a list
     # with the words repeated equally to their counts.
-    words_list = list()
+    words_list = []
 
     for index, value in words.items():
-        for _ in range(value):
-            words_list.append(index)
-
+        words_list.extend(index for _ in range(value))
     # We create the mask from our cloud image.
     mask = np.array(Image.open(MASK_FILE))
 
@@ -527,7 +535,7 @@ def generate_most_common_entities_word_cloud(df):
 
     # We load English and Spanish stop words that will be
     # get better results in our word cloud.
-    stopwords = list()
+    stopwords = []
 
     stopwords.extend(
         open(EN_STOPWORDS, "r", encoding="utf-8").read().splitlines())
@@ -546,7 +554,7 @@ def generate_most_common_entities_word_cloud(df):
 
     # Now that we have the entities and their counts we will create a list
     # with the entities repeated equally to their counts.
-    entities_list = list()
+    entities_list = []
 
     for index, value in entities.items():
 
@@ -554,9 +562,7 @@ def generate_most_common_entities_word_cloud(df):
         if index == "Mexico":
             index = "México"
 
-        for _ in range(value):
-            entities_list.append(index)
-
+        entities_list.extend(index for _ in range(value))
     # We create the mask from our cloud image.
     mask = np.array(Image.open(MASK_FILE))
 

@@ -3,6 +3,7 @@ This script uses the Pushshift API to download comments from the specified subre
 By default it downloads all the comments from the newest one to the first one of the specified date.
 """
 
+
 import csv
 import sys
 import time
@@ -17,7 +18,7 @@ sys.setrecursionlimit(10000)
 SUBREDDITS = ["mexico"]
 
 HEADERS = {"User-Agent": "Comments Downloader v0.2"}
-COMMENTS_LIST = list()
+COMMENTS_LIST = []
 
 # Year month and day.
 TARGET_DATE = "2019-01-01"
@@ -30,8 +31,14 @@ def init():
 
     for subreddit in SUBREDDITS:
 
-        writer = csv.writer(open("./{}-comments.csv".format(subreddit),
-                                 "w", newline="", encoding="utf-8"))
+        writer = csv.writer(
+            open(
+                f"./{subreddit}-comments.csv",
+                "w",
+                newline="",
+                encoding="utf-8",
+            )
+        )
 
         # Adding the header.
         writer.writerow(["datetime", "author", "body"])
@@ -73,7 +80,7 @@ def load_comments(subreddit, writer, latest_timestamp=None):
         total_comments = len(json_data["data"])
         latest_timestamp = 0
 
-        print("Downloading: {} comments".format(total_comments))
+        print(f"Downloading: {total_comments} comments")
 
         for item in json_data["data"]:
 

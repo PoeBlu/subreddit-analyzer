@@ -3,6 +3,7 @@ This script uses the Pushshift API to download submissions from the specified su
 By default it downloads all the submissions from the newest one to the first one of the specified date.
 """
 
+
 import csv
 import time
 import sys
@@ -18,7 +19,7 @@ sys.setrecursionlimit(10000)
 SUBREDDITS = ["mexico"]
 
 HEADERS = {"User-Agent": "Submissions Downloader v0.1"}
-SUBMISSIONS_LIST = list()
+SUBMISSIONS_LIST = []
 
 # Year month and day.
 TARGET_DATE = "2019-01-01"
@@ -31,8 +32,14 @@ def init():
 
     for subreddit in SUBREDDITS:
 
-        writer = csv.writer(open("./{}-submissions.csv".format(subreddit),
-                                 "w", newline="", encoding="utf-8"))
+        writer = csv.writer(
+            open(
+                f"./{subreddit}-submissions.csv",
+                "w",
+                newline="",
+                encoding="utf-8",
+            )
+        )
 
         # Adding the header.
         writer.writerow(["datetime", "author", "title", "url", "domain"])
@@ -74,7 +81,7 @@ def download_submissions(subreddit, latest_timestamp=None):
         total_submissions = len(json_data["data"])
         latest_timestamp = 0
 
-        print("Downloading: {} submissions".format(total_submissions))
+        print(f"Downloading: {total_submissions} submissions")
 
         for item in json_data["data"]:
 
@@ -84,7 +91,7 @@ def download_submissions(subreddit, latest_timestamp=None):
 
             iso_date = datetime.fromtimestamp(latest_timestamp)
             tld = tldextract.extract(item["url"])
-            domain = tld.domain + "." + tld.suffix
+            domain = f"{tld.domain}.{tld.suffix}"
 
             if item["is_self"] == True:
                 domain = "self-post"
